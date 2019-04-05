@@ -53,7 +53,7 @@ RESTORE='\033[0m'
 echo -e "${YELLOW}Installing any missing libraries and dependencies please wait...${RESTORE}"
 
 apt-get install aapt android-framework-res android-libaapt android-libandroidfw android-libbacktrace android-libbase android-libcutils android-liblog android-libunwind android-libutils android-libziparchive junit libantlr-java libantlr3-runtime-java libapache-pom-java libatinject-jsr330-api-java libcommons-cli-java libcommons-io-java libcommons-lang3-java libcommons-parent-java libguava-java libjaxp1.3-java libjsr305-java libprotobuf-lite17 libsmali-java libstringtemplate-java libxmlunit-java libxpp3-java libyaml-snake-java libzopfli1 apktool zipalign -y &>/dev/null
-
+wait
 echo
 echo -e "${GREEN}Libraries and dependencies are installed.${RESTORE}"
 sleep 2
