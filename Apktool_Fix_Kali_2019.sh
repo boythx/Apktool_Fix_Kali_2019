@@ -69,8 +69,8 @@ if [ "$statusCheck" == "2.4.0" ]; then
 else
     echo
     echo -e "${RED}Error: Corrupt or missing binaries. ${YELLOW}Removing all packages and reinstalling please wait...${RESTORE}"
-    apt-get purge apktool -y &>/dev/null && apt auto-remove -y &>/dev/null
-    wait
+    apt-get purge apktool -y &>/dev/null && apt auto-remove -y &>/dev/null; wait
+    apt-get install kali-linux-full -y &>/dev/null; wait
     __apk_tool_fix
     [[ $(apktool --version) = 2.4.0 ]] && exit || echo -e "${RED}Could not resolve ERROR contact developer!${RESTORE}"
 
