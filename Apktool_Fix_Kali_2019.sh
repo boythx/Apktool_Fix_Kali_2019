@@ -1,6 +1,6 @@
 #!/bin/bash 
 # Author: catenatedgoose
-# Version: 1.4
+# Version: 1.6
 # Description: A basic fix for apktool in kali linux. This script replaces apktool 2.3.4-dirty with 2.4 so common errors will be avoided. This also adds packages to work with msfvenom.
 
 RED='\033[00;31m'
@@ -16,9 +16,17 @@ echo '
 / /__/ _ `/ __/ -_) _ \/ _ `/ __/ -_) _  /___/ (_ / _ \/ _ \(_-</ -_)
 \___/\_,_/\__/\__/_//_/\_,_/\__/\__/\_,_/    \___/\___/\___/___/\__/' 
 echo                                                                  
-echo -e "${YELLOW}                 Apktool_Fix_Kali_2019 Version 1.4${BLUE}"
+echo -e "${YELLOW}                 Apktool_Fix_Kali_2019 Version 1.6${BLUE}"
 echo
 sleep 2
+
+con_chk=$(wget -q --tries=5 --timeout=20 --spider http://google.com ; echo $?)
+if [[ $con_chk != 0 ]]; then
+        echo -e "${RED}Warning!${YELLOW} This script needs an internet connection!"
+        echo
+        echo "Please connect to the internet and try again."
+        exit
+fi
 
 dpkg -s apt-rdepends &>/dev/null ||  echo -e "${YELLOW}Installing Recursive Package Dependency Manager (${GREEN}apt-rdepends${YELLOW}) Please wait...${BLUE}" ; sleep 2 ; echo ; apt-get install apt-rdepends &>/dev/null ; wait
 
