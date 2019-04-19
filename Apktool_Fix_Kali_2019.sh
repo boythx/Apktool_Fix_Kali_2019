@@ -28,7 +28,7 @@ if [[ $con_chk != 0 ]]; then
         exit
 fi
 
-dpkg -s apt-rdepends &>/dev/null ||  echo -e "${YELLOW}Installing Recursive Package Dependency Manager (${GREEN}apt-rdepends${YELLOW}) Please wait...${BLUE}" ; sleep 2 ; echo ; apt-get install apt-rdepends &>/dev/null ; wait
+dpkg -s apt-rdepends &>/dev/null ||  echo -e "${YELLOW}Installing Recursive Package Dependency Manager (${GREEN}apt-rdepends${YELLOW}) Please wait...${BLUE}" ; sleep 2 ; echo ; apt-get install apt-rdepends -y &>/dev/null ; wait
 
 
 __apk_tool_fix(){
