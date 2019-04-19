@@ -51,6 +51,7 @@ __apk_tool_fix(){
             apt-get install $depend -y &>/dev/null 
             wait
             dpkg-query -W --showformat='${Status}\n' $depend &>/dev/null && echo -e "${YELLOW}$depend is ${GREEN}Installed${RESTORE}" || echo -e "$depend ${RED}Install ERROR${RESTORE}"   
+            sleep .5      
         fi
     done 
 
