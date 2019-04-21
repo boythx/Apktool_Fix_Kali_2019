@@ -44,7 +44,6 @@ __apk_tool_fix(){
         pkg_qry=$(dpkg-query -W --showformat='${Status}\n' $depend &>/dev/null ; echo $?)
         if [ $pkg_qry = 0 ]; then
             echo -e "${YELLOW}$depend is ${GREEN}Installed.${RESTORE}"
-            sleep .1
         else 
             echo -e "${YELLOW}$depend is ${RED}missing.${RESTORE}"
             echo -e "${YELLOW}Installing ${RED}$depend ${YELLOW}now.${RESTORE}"
