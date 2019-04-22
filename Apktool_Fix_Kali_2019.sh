@@ -1,6 +1,6 @@
 #!/bin/bash 
 # Author: catenatedgoose
-# Version: 2.0
+# Version: 1.6
 # Description: A basic fix for apktool in kali linux. This script replaces apktool 2.3.4-dirty with 2.4 so common errors will be avoided. This also adds packages to work with msfvenom.
 
 RED='\033[00;31m'
@@ -16,7 +16,7 @@ echo '
     / /__/ _ `/ __/ -_) _ \/ _ `/ __/ -_) _  /___/ (_ / _ \/ _ \(_-</ -_)
     \___/\_,_/\__/\__/_//_/\_,_/\__/\__/\_,_/    \___/\___/\___/___/\__/' 
 echo                                                                      
-echo -e "${YELLOW}                     Apktool_Fix_Kali_2019 Version 2.0${BLUE}"
+echo -e "${YELLOW}                     Apktool_Fix_Kali_2019 Version 1.6${BLUE}"
 echo
 sleep 2
 
@@ -40,6 +40,7 @@ __apk_tool_fix(){
         else 
             x=1
             echo -e "${YELLOW}$depend is ${RED}missing.${RESTORE}"
+            ARRAY+=($depend)
         fi
     done 
 
@@ -106,4 +107,39 @@ if [ "$statusCheck" == "2.4.0" ]; then
         exit
     fi
 
+fi
+
+
+    mapfile -t pkg_depends < <(apt-cache depends apktool | cut -d':' -f2 | sed  "s/^[ \t]*//;/<java7-runtime-headless>/d" | sort -u)
+    pwd=$(pwd)
+    x=0
+    echo
+    for depend in "${pkg_depends[@]}"; do 
+        pkg_qry=$(dpkg-query -s $depend &>/dev/null ; echo $?)
+        if [ $pkg_qry = 0 ]; then
+            echo -e "${YELLOW}$depend is ${GREEN}Installed.${RESTORE}"
+        else 
+            x=1
+            echo -e "${YELLOW}$depend is ${RED}missing.${RESTORE}"
+            cd /tmp && apt-get download $depend &>/dev/null && cd $pwd
+            ARRAY+=($depend)
+        fi
+    done
+ 
+if [[ $x = 1 ]]; then 
+            echo    
+            echo -e "${YELLOW}The following packages will be installed:"
+            echo -e "${GREEN}${ARRAY[@]}" 
+            sleep 3
+            dpkg -i /tmp/*.deb &>/dev/null ; wait && rm /tmp/*.deb
+           
+              #revise  for dbl_chk in "${pkg_depends[@]}"; do 
+                    pkg_qry=$(dpkg-query -s $depend &>/dev/null ; echo $?)
+                    if [ $pkg_qry = 0 ]; then
+                        x=0
+                    else 
+                        x=1
+                     fi
+                 done
+         
 fi
