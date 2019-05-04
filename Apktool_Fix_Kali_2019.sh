@@ -98,7 +98,9 @@ TEST_APKTOOL() {
 
 APKTOOL_UPGRADE() {
     echo && echo -e "${YELLOW}Installing ${GREEN}Apktool 2.4.0 ${YELLOW}this may take a moment please wait...${RESTORE}" ; echo
-    axel -n 10 --output=/usr/bin/apktool https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool &>/dev/null ; wait && axel -n 10 --output=/usr/bin/apktool.jar https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.4.0.jar &>/dev/null ; wait && echo && echo -e "${YELLOW}Download complete ${GREEN}apktool ${YELLOW}wrapper and ${GREEN}apktool.jar ${YELLOW}are in /usr/bin"
+    axel -n 10 --output=/usr/bin/apktool https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool &>/dev/null ; wait
+    axel -n 10 --output=/usr/bin/apktool.jar https://bitbucket.org/iBotPeaches/apktool/downloads/apktool_2.4.0.jar &>/dev/null ; wait
+    echo -e "${YELLOW}Download complete ${GREEN}apktool ${YELLOW}wrapper and ${GREEN}apktool.jar ${YELLOW}are in /usr/bin"
     [ -e /usr/bin/apktool -a -e /usr/bin/apktool.jar ] && chmod +x /usr/bin/apktool /usr/bin/apktool.jar 
     TEST_APKTOOL
 }
