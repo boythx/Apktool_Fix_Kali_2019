@@ -9,6 +9,8 @@ YELLOW='\033[00;33m'
 BLUE='\033[0;34m'
 RESTORE='\033[0m'
 
+arg_one=$1
+
 echo -e "${BLUE}"
 echo '
       _____     __                __         __    _____                 
@@ -19,8 +21,10 @@ echo
 echo -e "${YELLOW}                     Apktool_Fix_Kali_2019 Version ${BLUE}2.0${RESTORE}"
 echo
 
+# Checking internet connection to exit with message if none
 [[ $(wget -q --tries=5 --timeout=20 --spider http://google.com ; echo $?) != 0 ]] && echo -e "${RED}Warning!${YELLOW} This script needs an internet connection!" && echo && echo -e "${YELLOW}Please connect to the internet and try again.${RESTORE}" && exit
 
+# Checking for for missing dependencies and install missing
 chk_inst_depends() {
     mapfile -t pkg_depends < <(apt-cache depends apktool | cut -d':' -f2 | sed  "s/^[ \t]*//;/<java7-runtime-headless>/d" | sed '/^apktool\b/d' | sort -u)
     pwd=$(pwd)
@@ -30,14 +34,17 @@ chk_inst_depends() {
         pkg_qry=$(dpkg-query -s $depend &>/dev/null ; echo $?)
         if [ $pkg_qry = 0 ]; then
             echo -e "${YELLOW}$depend is ${GREEN}Installed.${RESTORE}"
+            [[ $arg_one = "-R" ]] && x=2 && echo -e "${RED}Removing...${RESTORE}" && dpkg --purge --force-depends $depend &>/dev/null
         else 
             x=1
             echo -e "${YELLOW}$depend is ${RED}missing.${RESTORE}"
             MISSING+=($depend)
             [[ -e /tmp/repair_depends ]] || mkdir /tmp/repair_depends
-            cd /tmp/repair_depends && apt-get download $depend &>/dev/null && cd $pwd
+            cd /tmp/repair_depends && apt-get download $depend &>/dev/null && dpkg -i /tmp/repair_depends/$depend* &>/dev/null; wait
+            cd $pwd     
         fi
-    done      
+    done  
+    [[ $x = 2 ]] && exit 
     if [[ $x = 1 ]]; then 
 
         if [[ "${MISSING[*]} " != *"aapt"* ]] && [[ "${MISSING[*]} " == *"google-android-build-tools-installer"* ]]; then
@@ -78,14 +85,13 @@ chk_inst_depends() {
                 done         
         fi  
     
-    [[ -z ${MISSING[@]} ]] || echo && echo -e "${YELLOW}The following dependencies will be installed:" && sleep 2 && echo && for depends in ${MISSING[@]}; do echo -e "${BLUE}$depends${RESTORE}"; done
-    [[ -z "$(ls -A /tmp/repair_depends)" ]] || dpkg -i /tmp/repair_depends/*.deb &>/dev/null ; wait && apt --fix-broken install -y &>/dev/null ; wait
+    [[ -z ${MISSING[@]} ]] || echo && echo -e "${YELLOW}The following dependencies were installed:" && sleep 2 && echo && for depends in ${MISSING[@]}; do echo -e "${BLUE}$depends${RESTORE}"; done; sleep 2
     rm -r -f /tmp/repair_depends
-    
     fi
 }
 chk_inst_depends
 
+# Test if apktool is working properly
 TEST_APKTOOL() {
     echo && echo -e "${YELLOW}Testing ${GREEN}Apktool ${YELLOW}please wait..."
     wget -O /tmp/test.apk https://github.com/catenatedgoose/test.apk/blob/master/test.apk?raw=true &>/dev/null ; wait
@@ -96,6 +102,7 @@ TEST_APKTOOL() {
     [ ! -f /tmp/apk_d_error -a ! -f /tmp/apk_b_error ] && echo && echo -e "${GREEN}**** Apktool is working and ready to use ****${RESTORE}" && echo && rm -r -f /tmp/*.apk /tmp/test || rm -r/tmp/*_error
 }
 
+# Upgrade and install latest version of apktool
 APKTOOL_UPGRADE() {
     echo && echo -e "${YELLOW}Installing ${GREEN}Apktool 2.4.0 ${YELLOW}this may take a moment please wait...${RESTORE}" ; echo
     axel -n 10 --output=/usr/bin/apktool https://raw.githubusercontent.com/iBotPeaches/Apktool/master/scripts/linux/apktool &>/dev/null ; wait
@@ -105,7 +112,7 @@ APKTOOL_UPGRADE() {
     TEST_APKTOOL
 }
 
-
+# Check apktool version
 APKTOOL_VERSION() {
     echo && echo -e "${YELLOW}Checking the version of Apktool you have installed.${RESTORE}"
     sleep 1
@@ -115,8 +122,8 @@ APKTOOL_VERSION() {
         echo -e "${RED}**** ${YELLOW}Apktool is not the latest version! ${RED}****${RESTORE}"
         echo 
         echo -e "${YELLOW}Removing Apktool version $(apktool --version) please wait...${RESTORE}"
-        dpkg --purge --force-depends apktool &>/dev/null ; wait
-        [[ -e /usr/bin/apktool ]] && rm -f /usr/bin/apktool ; [[ -e /usr/bin/apktool.jar ]] && rm -f /usr/bin/apktool.jar
+        [[ -e /usr/bin/apktool ]] && rm -f /usr/bin/apktool
+        [[ -e /usr/bin/apktool.jar ]] && rm -f /usr/bin/apktool.jar
         APKTOOL_UPGRADE   
     else
         echo
@@ -127,4 +134,5 @@ APKTOOL_VERSION() {
 
 }
 
+# Testing for which function to run
 [ $(dpkg-query -s apktool &>/dev/null ; echo $?) = 0 -o -e /usr/bin/apktool ] && APKTOOL_VERSION || APKTOOL_UPGRADE
